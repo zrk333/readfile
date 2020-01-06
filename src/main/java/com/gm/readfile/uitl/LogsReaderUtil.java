@@ -1,6 +1,7 @@
 package com.gm.readfile.uitl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 
@@ -10,7 +11,7 @@ public class LogsReaderUtil {
     /**
      * 
      * @param filePath      文件路径的字符串表示形式
-     * @param keyWords      查找包含某个关键字的信息：非null为带关键字查询；null为全文显示
+     * @param keyWords      查找包含某些关键字的信息：非null为带关键字查询；null为全文显示
      * @return      当文件存在时，返回字符串；当文件不存在时，返回null
      */
     public static String readFromFile(String filePath, String ... keyWords){
@@ -37,6 +38,7 @@ public class LogsReaderUtil {
                         if(isContainsK){
                             stringBuffer.append(temp + "\n");
                         }
+
                     }
                 }
             } catch (FileNotFoundException e) {
@@ -62,6 +64,70 @@ public class LogsReaderUtil {
             return stringBuffer.toString();
         }
          
+    }
+
+    /**
+     *
+     * @param filePath      文件路径的字符串表示形式
+     * @param split         根据此字符串切割，取后面部分
+     * @param keyWords      查找包含某些关键字的信息：非null为带关键字查询；null为全文显示
+     * @return      当文件存在时，返回字符串；当文件不存在时，返回null
+     */
+    public static String readFromFile1(String filePath, String split,String ... keyWords){
+        StringBuffer stringBuffer = null;
+        File file = new File(filePath);
+        if(file.exists()){
+            stringBuffer = new StringBuffer();
+            FileReader fileReader = null;
+            BufferedReader bufferedReader = null;
+            String temp = "";
+            try {
+                fileReader = new FileReader(file);
+                bufferedReader = new BufferedReader(fileReader);
+                while((temp = bufferedReader.readLine()) != null){
+                    if(keyWords.length == 0){
+                        stringBuffer.append(temp + "\n");
+                    }else{
+                        boolean isContainsK = true;
+                        for(String keyword : keyWords){
+                            if(!temp.contains(keyword)){
+                                isContainsK = false;
+                            }
+                        }
+                        if(isContainsK){
+                            if(StringUtils.isNotEmpty(temp)) {
+                                if(temp.contains(split)){
+                                    temp = temp.substring(temp.indexOf(split)+split.length());
+                                }
+                                stringBuffer.append(temp + "\n");
+                            }
+                        }
+
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                log.error(e.getMessage(), e);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }finally{
+                try {
+                    fileReader.close();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+        if(stringBuffer == null){
+            return null;
+        }else{
+            return stringBuffer.toString();
+        }
+
     }
      
     /**

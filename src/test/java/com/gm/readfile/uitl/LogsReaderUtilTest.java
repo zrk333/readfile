@@ -11,7 +11,7 @@ public class LogsReaderUtilTest {
 
     @Test
     public void readFromFile(){
-        String str = LogsReaderUtil.readFromFile("D:\\server.log","SetInfoController","param","lessonid");
+        String str = LogsReaderUtil.readFromFile1("D:\\server.log","[param]","SetInfoController","param","lessonid");
         LogsReaderUtil.writeIntoFile(str,"D:\\server1.log",false);
 
     }
